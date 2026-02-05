@@ -33,12 +33,6 @@ Install as an editable package:
 pip install -e .
 ```
 
-Install with development dependencies:
-
-```bash
-pip install -e ".[dev]"
-```
-
 ## Usage
 
 ```python
