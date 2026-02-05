@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kestrel"
+version = "0.1.0"
+description = "An exploration of MCP code mode execution, focused on reducing token usage and increasing accuracy"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "Tejas Sathe"}
+]
+keywords = ["mcp", "code-mode", "token-optimization"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=22.0",
+    "pylint>=2.0",
+]
+
+[tool.setuptools]
+packages = ["kestrel"]
+
+[tool.black]
+line-length = 100
+
+[tool.pylint]
+max-line-length = 100
