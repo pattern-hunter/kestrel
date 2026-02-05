@@ -18,12 +18,6 @@ Or install a specific branch:
 pip install git+https://github.com/pattern-hunter/kestrel.git@main
 ```
 
-With development dependencies:
-
-```bash
-pip install "git+https://github.com/pattern-hunter/kestrel.git[dev]"
-```
-
 ### Option 2: Clone locally and install in development mode
 
 Clone the repository:
