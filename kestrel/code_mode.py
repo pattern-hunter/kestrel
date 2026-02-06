@@ -100,16 +100,14 @@ def init_llm(model: str) -> ChatGoogleGenerativeAI | ChatOllama:
 def create_execution_plan(prompt: str, services_directory: str, model: str) -> Tuple[str, Dict[str, List[str]]]:
     llm = init_llm(model=model)
     functions_list = get_all_client_functions(services_directory)
-    prompts_path = Path(__file__).resolve().parent / "prompts"
-    with open(prompts_path / "execution_plan.md", "r") as f:
+    with open("prompts/execution_plan.md", "r") as f:
         system_message = f.read().format(functions_list=functions_list, question=prompt)
         result = llm.invoke(system_message)
         # TODO: Figure out a good way to filter list of functions to only those needed
         return result.content, functions_list
     
 def write_execution_code(execution_plan: str, functions_list: Dict[str, List[str]], model: str) -> None:
-    prompts_path = Path(__file__).resolve().parent / "prompts"
-    with open(prompts_path / "write_code.md", "r") as f:
+    with open("prompts/write_code.md", "r") as f:
         system_message = f.read().format(functions_list=functions_list, execution_plan=execution_plan)
         llm = init_llm(model=model)
         result = llm.invoke(system_message)
