@@ -91,7 +91,7 @@ def init_llm_ollama(model: str) -> ChatOllama:
 
 def init_llm(model: str) -> ChatGoogleGenerativeAI | ChatOllama:
     if model.startswith("gemini"):
-        return init_llm_gemini()
+        return init_llm_gemini(model=model)
     else:
         return init_llm_ollama(model=model)
         
