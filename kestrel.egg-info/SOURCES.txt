@@ -1,0 +1,12 @@
+MANIFEST.in
+README.md
+pyproject.toml
+kestrel/__init__.py
+kestrel/code_mode.py
+kestrel.egg-info/PKG-INFO
+kestrel.egg-info/SOURCES.txt
+kestrel.egg-info/dependency_links.txt
+kestrel.egg-info/requires.txt
+kestrel.egg-info/top_level.txt
+kestrel/prompts/execution_plan.md
+kestrel/prompts/write_code.md
