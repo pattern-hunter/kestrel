@@ -47,7 +47,8 @@ functions = code_mode.get_all_client_functions(
 code, total_tokens = code_mode.create_execution_plan(
     prompt="Your prompt here",
     services_directory="./services",
-    model="gemini-pro"
+    model="gemini-pro",
+    client_file_name="client.py"
 )
 ```
 

@@ -18,6 +18,7 @@ def run_kestrel_code_mode(model: str, prompt: str) -> Tuple[int, int]:
         prompt=prompt,
         services_directory=services_dir,
         model=model,
+        client_file_name="client.py"
     )
 
     print(f"\n📋 Execution Plan:\n{execution_plan}")

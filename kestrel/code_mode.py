@@ -124,9 +124,9 @@ def build_imports(services_dir: str) -> str:
     return imports_code
 
 # TODO: name it better
-def create_execution_plan(prompt: str, services_directory: str, model: str) -> Tuple[str, int]:
+def create_execution_plan(prompt: str, services_directory: str, client_file_name: str, model: str) -> Tuple[str, int]:
     llm = init_llm(model=model)
-    functions_list = get_all_client_functions(services_dir=services_directory, client_file_name="client.py")
+    functions_list = get_all_client_functions(services_dir=services_directory, client_file_name=client_file_name)
     print(f"\nFunctions list: {functions_list}\n")
     prompts_path = Path(__file__).resolve().parent / "prompts"
     with open(prompts_path / "execution_plan.md", "r") as f:
