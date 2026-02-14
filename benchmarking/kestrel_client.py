@@ -6,22 +6,28 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
 from typing import Tuple
 import time
+from pathlib import Path
+import importlib.util
 
 
 def run_kestrel_code_mode(model: str, prompt: str) -> Tuple[int, int]:
     start = time.time()
+    services_dir = "benchmarking/services"
+
     execution_plan, functions_list, execution_plan_tokens = code_mode.create_execution_plan(
         prompt=prompt,
-        services_directory="benchmarking/services",
-        model=model
+        services_directory=services_dir,
+        model=model,
     )
 
-    code_to_execute, code_writing_tokens = code_mode.write_execution_code(
-        execution_plan=execution_plan,
-        functions_list=functions_list,
-        model=model
-    )
+    # Build imports code that dynamically loads each services/*/client.py by absolute path.
+    code_to_execute = code_mode.build_imports(services_dir=services_dir) + "\n" + execution_plan
+
+    print(f"\n📋 Execution Plan:\n{code_to_execute}")
 
     result, error, return_code = code_mode.execute_plan_subprocess(code_to_execute)
 
-    return execution_plan_tokens + code_writing_tokens, int(time.time() - start)
+    print(f"\n🧑‍💻 Execution Result:\n{result}")
+    print(f"\n❌ Execution Error:\n{error}")
+
+    return execution_plan_tokens, int(time.time() - start)

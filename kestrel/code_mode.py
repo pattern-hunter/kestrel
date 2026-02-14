@@ -104,6 +104,25 @@ def init_llm(model: str) -> ChatGoogleGenerativeAI | ChatOllama:
         
 
 
+def build_imports(services_dir: str) -> str:
+    """
+    Build import statements for all client.py files in the services directory.
+    
+    Args:
+        services_dir: Path to the services directory
+    
+    Returns:
+        String of import statements
+    """
+    import_prefix = services_dir.replace("/", ".")
+    imports_code = ""
+    
+    for client_file in Path(services_dir).rglob('client.py'):
+        mod_name = f"service_{client_file.parent.name}"
+        imports_code += f"import {import_prefix}.{mod_name}.client as {mod_name}\n"
+    
+    return imports_code
+
 def create_execution_plan(prompt: str, services_directory: str, model: str) -> Tuple[str, Dict[str, List[str]], int]:
     llm = init_llm(model=model)
     functions_list = get_all_client_functions(services_directory)
