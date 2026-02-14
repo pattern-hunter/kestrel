@@ -40,9 +40,7 @@ from kestrel import code_mode
 
 # Extract function signatures from client.py files
 functions = code_mode.get_all_client_functions(
-    prompt="Your prompt here",
-    services_directory="./services",
-    model="gemini-pro"
+    services_dir="./services", client_file_name="client.py"
 )
 
 # Create execution plan

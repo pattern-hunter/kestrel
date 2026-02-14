@@ -68,7 +68,7 @@ def get_function_signatures(file_path: str) -> List[str]:
     
     return functions
 
-def get_all_client_functions(services_dir: str) -> Dict[str, List[str]]:
+def get_all_client_functions(services_dir: str, client_file_name: str) -> Dict[str, List[str]]:
     """
     Extract function signatures from all client.py files in services directory.
     
@@ -82,7 +82,7 @@ def get_all_client_functions(services_dir: str) -> Dict[str, List[str]]:
     services_path = Path(services_dir)
     
     # Find all client.py files
-    for client_file in services_path.rglob('client.py'):
+    for client_file in services_path.rglob(client_file_name):
         service_name = client_file.parent.name
         functions = get_function_signatures(str(client_file))
         client_functions[service_name] = functions
@@ -125,7 +125,7 @@ def build_imports(services_dir: str) -> str:
 
 def create_execution_plan(prompt: str, services_directory: str, model: str) -> Tuple[str, Dict[str, List[str]], int]:
     llm = init_llm(model=model)
-    functions_list = get_all_client_functions(services_directory)
+    functions_list = get_all_client_functions(services_dir=services_directory, client_file_name="client.py")
     print(f"\nFunctions list: {functions_list}\n")
     prompts_path = Path(__file__).resolve().parent / "prompts"
     with open(prompts_path / "execution_plan.md", "r") as f:
