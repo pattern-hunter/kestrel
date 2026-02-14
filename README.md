@@ -46,14 +46,11 @@ functions = code_mode.get_all_client_functions(
 )
 
 # Create execution plan
-plan, functions_list = code_mode.create_execution_plan(
+code, functions_list = code_mode.create_execution_plan(
     prompt="Your prompt here",
     services_directory="./services",
     model="gemini-pro"
 )
-
-# Write execution code
-code = code_mode.write_execution_code(plan, functions_list, "gemini-pro")
 ```
 
 ## Project Structure
