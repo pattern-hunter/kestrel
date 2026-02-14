@@ -14,7 +14,7 @@ def run_kestrel_code_mode(model: str, prompt: str) -> Tuple[int, int]:
     start = time.time()
     services_dir = "benchmarking/services"
 
-    execution_plan, functions_list, execution_plan_tokens = code_mode.create_execution_plan(
+    execution_plan, execution_plan_tokens = code_mode.create_execution_plan(
         prompt=prompt,
         services_directory=services_dir,
         model=model,

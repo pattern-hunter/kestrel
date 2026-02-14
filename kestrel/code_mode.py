@@ -123,7 +123,8 @@ def build_imports(services_dir: str) -> str:
     
     return imports_code
 
-def create_execution_plan(prompt: str, services_directory: str, model: str) -> Tuple[str, Dict[str, List[str]], int]:
+# TODO: name it better
+def create_execution_plan(prompt: str, services_directory: str, model: str) -> Tuple[str, int]:
     llm = init_llm(model=model)
     functions_list = get_all_client_functions(services_dir=services_directory, client_file_name="client.py")
     print(f"\nFunctions list: {functions_list}\n")
@@ -133,7 +134,7 @@ def create_execution_plan(prompt: str, services_directory: str, model: str) -> T
         result = llm.invoke(system_message)
         # TODO: Figure out a good way to filter list of functions to only those needed
         code = build_imports(services_dir=services_directory) + "\n" + result.content
-        return code, functions_list, int(result.usage_metadata['total_tokens'])
+        return code, int(result.usage_metadata['total_tokens'])
     
 
 def execute_plan_subprocess(execution_plan: str) -> tuple[str, str, int]:

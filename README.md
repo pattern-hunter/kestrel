@@ -44,7 +44,7 @@ functions = code_mode.get_all_client_functions(
 )
 
 # Create execution plan
-code, functions_list = code_mode.create_execution_plan(
+code, total_tokens = code_mode.create_execution_plan(
     prompt="Your prompt here",
     services_directory="./services",
     model="gemini-pro"
