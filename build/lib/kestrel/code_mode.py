@@ -8,7 +8,6 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
 import subprocess
 import tempfile
-from testcontainers.generic import GenericContainer
 
 def get_function_signatures(file_path: str) -> List[str]:
     """
@@ -27,11 +26,12 @@ def get_function_signatures(file_path: str) -> List[str]:
             tree = ast.parse(f.read())
         
         for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef):
+            is_async = isinstance(node, ast.AsyncFunctionDef)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 # Skip private/magic functions
                 if node.name.startswith('_'):
                     continue
-                
+
                 # Get function arguments
                 args = node.args
                 arg_names = [arg.arg for arg in args.args]
@@ -59,8 +59,8 @@ def get_function_signatures(file_path: str) -> List[str]:
                         return_type = str(node.returns.value)
                     else:
                         return_type = ast.unparse(node.returns)
-                
-                signature = f"{node.name}({', '.join(arg_strs)}) -> {return_type}"
+                prefix = "async " if is_async else ""
+                signature = f"{prefix}{node.name}({', '.join(arg_strs)}) -> {return_type}"
                 functions.append(signature)
     
     except Exception as e:
@@ -68,7 +68,7 @@ def get_function_signatures(file_path: str) -> List[str]:
     
     return functions
 
-def get_all_client_functions(services_dir: str) -> Dict[str, List[str]]:
+def get_all_client_functions(services_dir: str, client_file_name: str) -> Dict[str, List[str]]:
     """
     Extract function signatures from all client.py files in services directory.
     
@@ -82,7 +82,7 @@ def get_all_client_functions(services_dir: str) -> Dict[str, List[str]]:
     services_path = Path(services_dir)
     
     # Find all client.py files
-    for client_file in services_path.rglob('client.py'):
+    for client_file in services_path.rglob(client_file_name):
         service_name = client_file.parent.name
         functions = get_function_signatures(str(client_file))
         client_functions[service_name] = functions
@@ -104,9 +104,28 @@ def init_llm(model: str) -> ChatGoogleGenerativeAI | ChatOllama:
         
 
 
+def build_imports(services_dir: str) -> str:
+    """
+    Build import statements for all client.py files in the services directory.
+    
+    Args:
+        services_dir: Path to the services directory
+    
+    Returns:
+        String of import statements
+    """
+    import_prefix = services_dir.replace("/", ".")
+    imports_code = ""
+    
+    for client_file in Path(services_dir).rglob('client.py'):
+        mod_name = f"service_{client_file.parent.name}"
+        imports_code += f"import {import_prefix}.{mod_name}.client as {mod_name}\n"
+    
+    return imports_code
+
 def create_execution_plan(prompt: str, services_directory: str, model: str) -> Tuple[str, Dict[str, List[str]], int]:
     llm = init_llm(model=model)
-    functions_list = get_all_client_functions(services_directory)
+    functions_list = get_all_client_functions(services_dir=services_directory, client_file_name="client.py")
     print(f"\nFunctions list: {functions_list}\n")
     prompts_path = Path(__file__).resolve().parent / "prompts"
     with open(prompts_path / "execution_plan.md", "r") as f:
@@ -114,14 +133,6 @@ def create_execution_plan(prompt: str, services_directory: str, model: str) -> T
         result = llm.invoke(system_message)
         # TODO: Figure out a good way to filter list of functions to only those needed
         return result.content, functions_list, int(result.usage_metadata['total_tokens'])
-    
-def write_execution_code(execution_plan: str, functions_list: Dict[str, List[str]], model: str) -> None:
-    prompts_path = Path(__file__).resolve().parent / "prompts"
-    with open(prompts_path / "write_code.md", "r") as f:
-        system_message = f.read().format(functions_list=functions_list, execution_plan=execution_plan)
-        llm = init_llm(model=model)
-        result = llm.invoke(system_message)
-        return result.content
     
 
 def execute_plan_subprocess(execution_plan: str) -> tuple[str, str, int]:

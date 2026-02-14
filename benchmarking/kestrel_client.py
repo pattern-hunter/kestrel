@@ -20,12 +20,9 @@ def run_kestrel_code_mode(model: str, prompt: str) -> Tuple[int, int]:
         model=model,
     )
 
-    # Build imports code that dynamically loads each services/*/client.py by absolute path.
-    code_to_execute = code_mode.build_imports(services_dir=services_dir) + "\n" + execution_plan
+    print(f"\n📋 Execution Plan:\n{execution_plan}")
 
-    print(f"\n📋 Execution Plan:\n{code_to_execute}")
-
-    result, error, return_code = code_mode.execute_plan_subprocess(code_to_execute)
+    result, error, return_code = code_mode.execute_plan_subprocess(execution_plan=execution_plan)
 
     print(f"\n🧑‍💻 Execution Result:\n{result}")
     print(f"\n❌ Execution Error:\n{error}")
