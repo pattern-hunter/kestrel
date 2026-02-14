@@ -39,7 +39,11 @@ pip install -e .
 from kestrel import code_mode
 
 # Extract function signatures from client.py files
-functions = code_mode.get_all_client_functions("./services")
+functions = code_mode.get_all_client_functions(
+    prompt="Your prompt here",
+    services_directory="./services",
+    model="gemini-pro"
+)
 
 # Create execution plan
 plan, functions_list = code_mode.create_execution_plan(
@@ -56,10 +60,24 @@ code = code_mode.write_execution_code(plan, functions_list, "gemini-pro")
 
 ```
 kestrel/
+├── benchmarking/            # Example scripts and benchmarks and service clients
+│   ├── kestrel_client.py
+│   ├── mcp_client.py
+│   └── services/            # Example MCP service clients (e.g. nasa_iss_locator)
+├── build/                   # Build artifacts (wheels, dist)
 ├── kestrel/                 # Main package
 │   ├── __init__.py
-│   ├── code_mode.py        # Core functionality
-│   └── prompts/            # Prompt templates
-├── pyproject.toml          # Package configuration
+│   ├── code_mode.py         # Core functionality (execution plan, codegen, runner)
+│   └── prompts/             # Prompt templates
+├── pyproject.toml           # Package configuration
+├── MANIFEST.in
 └── README.md
+```
+
+## Run benchmark
+To run a benchmark test, do the following:
+- Add a *.env* file in the *benchmarking* folder. In the *.env* file, set *GEMINI_API_KEY* to your Gemini key
+- Run the command
+```
+make run_benchmark
 ```
