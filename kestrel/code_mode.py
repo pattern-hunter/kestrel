@@ -8,7 +8,6 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
 import subprocess
 import tempfile
-from testcontainers.generic import GenericContainer
 
 def get_function_signatures(file_path: str) -> List[str]:
     """
@@ -27,11 +26,12 @@ def get_function_signatures(file_path: str) -> List[str]:
             tree = ast.parse(f.read())
         
         for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef):
+            is_async = isinstance(node, ast.AsyncFunctionDef)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 # Skip private/magic functions
                 if node.name.startswith('_'):
                     continue
-                
+
                 # Get function arguments
                 args = node.args
                 arg_names = [arg.arg for arg in args.args]
@@ -59,8 +59,8 @@ def get_function_signatures(file_path: str) -> List[str]:
                         return_type = str(node.returns.value)
                     else:
                         return_type = ast.unparse(node.returns)
-                
-                signature = f"{node.name}({', '.join(arg_strs)}) -> {return_type}"
+                prefix = "async " if is_async else ""
+                signature = f"{prefix}{node.name}({', '.join(arg_strs)}) -> {return_type}"
                 functions.append(signature)
     
     except Exception as e:
@@ -115,13 +115,13 @@ def create_execution_plan(prompt: str, services_directory: str, model: str) -> T
         # TODO: Figure out a good way to filter list of functions to only those needed
         return result.content, functions_list, int(result.usage_metadata['total_tokens'])
     
-def write_execution_code(execution_plan: str, functions_list: Dict[str, List[str]], model: str) -> None:
+def write_execution_code(execution_plan: str, functions_list: Dict[str, List[str]], model: str) -> Tuple[str, int]:
     prompts_path = Path(__file__).resolve().parent / "prompts"
     with open(prompts_path / "write_code.md", "r") as f:
         system_message = f.read().format(functions_list=functions_list, execution_plan=execution_plan)
         llm = init_llm(model=model)
         result = llm.invoke(system_message)
-        return result.content
+        return result.content, result.usage_metadata['total_tokens']
     
 
 def execute_plan_subprocess(execution_plan: str) -> tuple[str, str, int]:
