@@ -3,7 +3,8 @@ import asyncio
 
 # Initialize prompts and models
 prompts = ["What is the current location of the International Space Station?"]
-models = ["llama3.1"]
+# models = ["llama3.1"]
+models = ["gemini-2.5-flash"]
 
 
 for prompt in prompts:
