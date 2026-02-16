@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_anthropic import ChatAnthropic
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
 import subprocess
@@ -96,9 +97,14 @@ def init_llm_gemini(model: str) -> ChatGoogleGenerativeAI:
 def init_llm_ollama(model: str) -> ChatOllama:
     return ChatOllama(model=model)
 
+def init_llm_anthropic(model: str) -> ChatAnthropic:
+    return ChatAnthropic(model=model, temperature=0)
+
 def init_llm(model: str) -> ChatGoogleGenerativeAI | ChatOllama:
     if model.startswith("gemini"):
         return init_llm_gemini(model=model)
+    elif model.startswith("claude"):
+        return init_llm_anthropic(model=model)
     else:
         return init_llm_ollama(model=model)
         
@@ -114,12 +120,13 @@ def build_imports(services_dir: str) -> str:
     Returns:
         String of import statements
     """
-    import_prefix = services_dir.replace("/", ".")
+    # import_prefix = services_dir.replace("/", ".")
     imports_code = ""
     
     for client_file in Path(services_dir).rglob('client.py'):
-        mod_name = client_file.parent.name
-        imports_code += f"import {import_prefix}.{mod_name}.client as {mod_name}\n"
+        parent = client_file.parent
+        mod_name = parent.name
+        imports_code += f"import {str(parent).replace('/', '.')}.client as {mod_name}\n"
     
     return imports_code
 

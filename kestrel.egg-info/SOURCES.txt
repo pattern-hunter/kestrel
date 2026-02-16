@@ -9,4 +9,3 @@ kestrel.egg-info/dependency_links.txt
 kestrel.egg-info/requires.txt
 kestrel.egg-info/top_level.txt
 kestrel/prompts/execution_plan.md
-kestrel/prompts/write_code.md

@@ -6,3 +6,4 @@ mcp-use
 aiohttp
 geopy
 testcontainers
+langchain-anthropic

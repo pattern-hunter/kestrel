@@ -11,4 +11,6 @@ transformed_data = transform_operation(input_data)
 function_name(arg1, transformed_data)
 function_name2(result_from_previous)
 
+Import any libraries required for the execution.
+
 The final line MUST be a Python statement that prints the final result (for example: print(result) or print(final_value)). Do not include any additional text.
